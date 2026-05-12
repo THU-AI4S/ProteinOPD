@@ -1,0 +1,64 @@
+student:
+  backbone_path: /path/to/ProLLaMA_model
+  lora:
+    r: 8
+    alpha: 16
+    dropout: 0.1
+    target_modules:
+      - q_proj
+      - v_proj
+      - k_proj
+      - o_proj
+      - gate_proj
+      - down_proj
+      - up_proj
+
+teachers:
+  backbone_path: /path/to/ProLLaMA_model
+  adapters:
+    - name: teacher_1
+      adapter_path: /path/to/prollama_teacher_lora_1
+      weight: 0.3333333333
+      temperature: 0.7
+    - name: teacher_2
+      adapter_path: /path/to/prollama_teacher_lora_2
+      weight: 0.3333333333
+      temperature: 0.7
+    - name: teacher_3
+      adapter_path: /path/to/prollama_teacher_lora_3
+      weight: 0.3333333334
+      temperature: 0.7
+
+prompt:
+  instruction: "[Generate by superfamily]"
+  input: "Superfamily=<Lysozyme-like domain superfamily>"
+  sequence_regex: "Seq=<([^>]*)>"
+
+distill:
+  loss_type: jsd
+  beta: 0.5
+  top_k_loss: 0
+  use_z_t: false
+  use_entropy_rule: false
+  entropy_alpha: 0.0
+  log_teacher_entropy: false
+  use_wi_entropy: false
+  use_wi_distance: false
+  wi_entropy_tau: 1.0
+  wi_distance_beta: 0.9
+  wi_distance_tau: 1.0
+  protein_opd:
+    debug_teacher_diff: false
+    debug_teacher_diff_steps: 5
+
+generation:
+  num_train_samples: 8192
+  max_new_tokens: 512
+  student_temperature: 1.0
+  use_curriculum_tem: false
+  curriculum_tem_start: 0.7
+  repetition_penalty: 1.2
+  top_p: 0.9
+  top_k: 200
+  save_generations: true
+  generation_save_steps: 100

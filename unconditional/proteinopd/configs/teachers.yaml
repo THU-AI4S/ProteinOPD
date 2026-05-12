@@ -1,0 +1,15 @@
+log_teacher_entropy: false
+teacher_backbone_path: /path/to/protgpt2-backbone
+teachers:
+  - name: teacher_1
+    adapter_path: /path/to/teacher_adapter_1
+    weight: 0.3333333333
+    temperature: 1.0
+  - name: teacher_2
+    adapter_path: /path/to/teacher_adapter_2
+    weight: 0.3333333333
+    temperature: 1.0
+  - name: teacher_3
+    adapter_path: /path/to/teacher_adapter_3
+    weight: 0.3333333334
+    temperature: 1.0

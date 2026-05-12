@@ -1,0 +1,15 @@
+load_mode: lora
+model: /path/to/ProLLaMA_model
+adapter_path: /path/to/conditional_geometric_opd_lora_adapter
+superfamily: Lysozyme-like domain superfamily
+seq_prefix:
+num_sequences: 256
+generation_batch_size: 8
+output_json: outputs/conditional_generate.json
+temperature: 0.7
+top_k: 200
+top_p: 0.9
+repetition_penalty: 1.2
+max_new_tokens: 512
+do_sample: true
+seed: 42

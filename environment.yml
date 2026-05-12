@@ -1,0 +1,25 @@
+name: proteinopd
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - pytorch
+  - pytorch-cuda=12.1
+  - numpy
+  - pandas
+  - pip:
+      - accelerate
+      - datasets
+      - deepspeed
+      - peft
+      - pyyaml
+      - safetensors
+      - sentencepiece
+      - tensorboard
+      - tokenizers
+      - tqdm
+      - transformers
+      - wandb

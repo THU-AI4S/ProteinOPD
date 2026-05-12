@@ -1,0 +1,15 @@
+# Install PyTorch separately for the target CUDA runtime, or use environment.yml.
+accelerate
+datasets
+deepspeed
+numpy
+pandas
+peft
+pyyaml
+safetensors
+sentencepiece
+tensorboard
+tokenizers
+tqdm
+transformers
+wandb

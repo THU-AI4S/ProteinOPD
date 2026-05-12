@@ -1,0 +1,15 @@
+base_model_path: /path/to/ProtGPT2
+adapter_path: /path/to/unconditional_geometric_opd_adapter
+output_json_path: outputs/unconditional_generate.json
+num_sequences: 1000
+batch_size: 8
+max_new_tokens: 512
+do_sample: true
+temperature: 0.7
+top_p: 0.95
+top_k: 500
+repetition_penalty: 1.2
+seed: 42
+use_bf16_if_available: true
+trust_remote_code: true
+overwrite_output: true
