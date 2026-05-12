@@ -35,11 +35,11 @@
       <section class="hero" id="overview">
         <div class="hero-copy">
           <p class="eyebrow">Preference alignment for protein design</p>
-          <h1>ProteinOPD: Towards Effective and Efficient Preference Alignment for Protein Design</h1>
+          <h1>ProteinOPD</h1>
+          <p class="subtitle">Towards Effective and Efficient Preference Alignment for Protein Design</p>
           <p class="hero-text">
-            ProteinOPD aligns protein language models with multiple competing objectives while
-            preserving designability. It constructs preference-specific teachers and distills their
-            consensus into a shared student with token-level on-policy distillation.
+            A multi-objective on-policy distillation framework that aligns protein language models
+            with competing design preferences while preserving the pretrained model's designability.
           </p>
           <div class="hero-actions" aria-label="Project links">
             <a class="button primary" href="https://github.com/THU-AI4S/ProteinOPD">GitHub</a>
@@ -48,45 +48,30 @@
               class="button"
               href="https://colab.research.google.com/github/THU-AI4S/ProteinOPD/blob/main/notebooks/proteinopd_inference.ipynb"
             >Inference Colab</a>
-          </div>
-          <dl class="hero-stats" aria-label="Key results">
-            <div>
-              <dt>0.62</dt>
-              <dd>Hypervolume</dd>
-            </div>
-            <div>
-              <dt>34.8%</dt>
-              <dd>HV gain over MoMPNN</dd>
-            </div>
-            <div>
-              <dt>8x</dt>
-              <dd>Training speedup</dd>
-            </div>
-          </dl>
-        </div>
-        <div class="hero-visual" aria-label="ProteinOPD concept">
-          <div class="sequence-card">
-            <div class="sequence-row">
-              <span>M</span><span>P</span><span>T</span><span>R</span><span>M</span><span>K</span>
-            </div>
-            <div class="score-grid">
-              <div><strong>pLDDT</strong><span>74.37</span></div>
-              <div><strong>Sol</strong><span>0.69</span></div>
-              <div><strong>Thermo</strong><span>0.74</span></div>
-              <div><strong>PPL</strong><span>55.25</span></div>
-            </div>
-          </div>
-          <div class="consensus-card">
-            <p>Teacher policies</p>
-            <div class="bars" aria-hidden="true">
-              <span style="height: 56%"></span>
-              <span style="height: 82%"></span>
-              <span style="height: 38%"></span>
-              <span style="height: 68%"></span>
-            </div>
-            <p>Geometric consensus</p>
+            <a
+              class="button"
+              href="https://colab.research.google.com/github/THU-AI4S/ProteinOPD/blob/main/notebooks/proteinopd_training_demo.ipynb"
+            >Training Demo</a>
           </div>
         </div>
+        <figure class="hero-figure">
+          <img src="assets/figure-3-method.png" alt="ProteinOPD method overview with teacher construction, standard OPD, and generalized OPD.">
+          <figcaption>ProteinOPD constructs preference teachers and distills their geometric consensus into a shared student.</figcaption>
+        </figure>
+        <dl class="hero-stats" aria-label="Key results">
+          <div>
+            <dt>0.62</dt>
+            <dd>Best overall HV in the unconditional multi-objective setting</dd>
+          </div>
+          <div>
+            <dt>34.8%</dt>
+            <dd>HV improvement over the strongest cross-paradigm reference</dd>
+          </div>
+          <div>
+            <dt>8x</dt>
+            <dd>Training speedup over RL-based alignment competitors</dd>
+          </div>
+        </dl>
       </section>
 
       <section class="section" id="contributions">
@@ -136,6 +121,10 @@
           <h2>Teacher construction, OPD, and consensus distillation</h2>
         </div>
         <div class="method-layout">
+          <figure class="figure-panel featured-figure">
+            <img src="assets/figure-3-method.png" alt="ProteinOPD method overview with teacher construction, standard OPD, and generalized OPD.">
+            <figcaption>Figure 3. ProteinOPD framework overview.</figcaption>
+          </figure>
           <div class="method-steps">
             <article>
               <span>Stage 1</span>
@@ -162,10 +151,6 @@
               </p>
             </article>
           </div>
-          <figure class="figure-panel featured-figure">
-            <img src="assets/figure-3-method.png" alt="ProteinOPD method overview with teacher construction, standard OPD, and generalized OPD.">
-            <figcaption>Figure 3. ProteinOPD framework overview.</figcaption>
-          </figure>
         </div>
       </section>
 

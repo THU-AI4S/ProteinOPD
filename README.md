@@ -2,9 +2,6 @@
 
 Paper: [ProteinOPD: Towards Effective and Efficient Preference Alignment for Protein Design](https://arxiv.org/abs/2605.10189)
 
-[![Open Training Demo in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/THU-AI4S/ProteinOPD/blob/main/notebooks/proteinopd_training_demo.ipynb)
-[![Open Inference in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/THU-AI4S/ProteinOPD/blob/main/notebooks/proteinopd_inference.ipynb)
-
 ProteinOPD currently contains two training and generation tracks:
 
 - `unconditional`: ProtGPT2 prefix-tuning teacher construction, ProtGPT2 geometric ProteinOPD training, and unconditional generation.
@@ -14,13 +11,12 @@ ProteinOPD currently contains two training and generation tracks:
 
 ![ProteinOPD pipeline](images/pipeline.png)
 
-The original PDF version is available at [images/pipeline.pdf](images/pipeline.pdf).
-
 ## Colab Notebooks
 
 - [Training Demo](notebooks/proteinopd_training_demo.ipynb): a small Colab-friendly workflow for training a teacher adapter and then a ProteinOPD student adapter. 
+[![Open Training Demo in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/THU-AI4S/ProteinOPD/blob/main/notebooks/proteinopd_training_demo.ipynb)
 - [Inference](notebooks/proteinopd_inference.ipynb): the recommended Colab entry point for generating protein sequences from the released unconditional and conditional multi-preference aligned adapters.
-
+[![Open Inference in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/THU-AI4S/ProteinOPD/blob/main/notebooks/proteinopd_inference.ipynb)
 
 ## Environment Setup
 
