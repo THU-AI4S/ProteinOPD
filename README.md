@@ -1,6 +1,6 @@
 # ProteinOPD
 
-Paper: [ProteinOPD: Geometric Protein Optimization via Optimal Planning in Diffusion Paths](https://arxiv.org/abs/2605.10189)
+Paper: [ProteinOPD: Towards Effective and Efficient Preference Alignment for Protein Design](https://arxiv.org/abs/2605.10189)
 
 ProteinOPD currently contains two training and generation tracks:
 
