@@ -2,7 +2,7 @@
 accelerate==1.12.0
 datasets==4.4.2
 deepspeed
-huggingface_hub==1.14.0
+huggingface_hub
 numpy
 pandas
 peft==0.18.0

@@ -14,7 +14,7 @@ dependencies:
       - accelerate==1.12.0
       - datasets==4.4.2
       - deepspeed
-      - huggingface_hub==1.14.0
+      - huggingface_hub
       - peft==0.18.0
       - pyyaml
       - safetensors==0.7.0
