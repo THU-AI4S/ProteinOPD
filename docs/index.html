@@ -24,10 +24,12 @@
       <nav class="site-nav" aria-label="Primary navigation">
         <a href="#overview">Overview</a>
         <a href="#contributions">Contributions</a>
-        <a href="#method">Method</a>
-        <a href="#results">Results</a>
-        <a href="#resources">Resources</a>
-        <a href="#citation">Citation</a>
+        <a href="#outline">Outline</a>
+        <a href="#main-results">Main Results</a>
+        <a href="#rq1">RQ1</a>
+        <a href="#rq2">RQ2</a>
+        <a href="#rq3">RQ3</a>
+        <a href="#case-study">Case</a>
       </nav>
     </header>
 
@@ -42,22 +44,18 @@
             with competing design preferences while preserving the pretrained model's designability.
           </p>
           <div class="hero-actions" aria-label="Project links">
-            <a class="button primary" href="https://github.com/THU-AI4S/ProteinOPD">GitHub</a>
-            <a class="button" href="https://arxiv.org/abs/2605.10189">arXiv</a>
+            <a class="button primary" href="https://github.com/THU-AI4S/ProteinOPD">Code</a>
+            <a class="button" href="https://arxiv.org/abs/2605.10189">Paper</a>
             <a
               class="button"
               href="https://colab.research.google.com/github/THU-AI4S/ProteinOPD/blob/main/notebooks/proteinopd_inference.ipynb"
-            >Inference Colab</a>
+            >Colab: Inference</a>
             <a
               class="button"
               href="https://colab.research.google.com/github/THU-AI4S/ProteinOPD/blob/main/notebooks/proteinopd_training_demo.ipynb"
-            >Training Demo</a>
+            >Colab: Training</a>
           </div>
         </div>
-        <figure class="hero-figure">
-          <img src="assets/figure-3-method.png" alt="ProteinOPD method overview with teacher construction, standard OPD, and generalized OPD.">
-          <figcaption>ProteinOPD constructs preference teachers and distills their geometric consensus into a shared student.</figcaption>
-        </figure>
         <dl class="hero-stats" aria-label="Key results">
           <div>
             <dt>0.62</dt>
@@ -115,9 +113,9 @@
         </div>
       </section>
 
-      <section class="section method-section" id="method">
+      <section class="section method-section" id="outline">
         <div class="section-heading">
-          <p class="eyebrow">Method</p>
+          <p class="eyebrow">Outline</p>
           <h2>Teacher construction, OPD, and consensus distillation</h2>
         </div>
         <div class="method-layout">
@@ -154,10 +152,10 @@
         </div>
       </section>
 
-      <section class="section results-section" id="results">
+      <section class="section results-section" id="main-results">
         <div class="section-heading">
-          <p class="eyebrow">Results</p>
-          <h2>Better alignment-designability trade-offs</h2>
+          <p class="eyebrow">Main Results</p>
+          <h2>Performance on multi-objective preference alignment</h2>
         </div>
         <div class="result-highlights">
           <article>
@@ -174,67 +172,90 @@
           </article>
         </div>
 
-        <div class="figure-grid">
-          <figure class="figure-panel wide">
-            <img src="assets/table-1-unconditional-results.png" alt="Table comparing ProteinOPD with baselines in unconditional multi-objective preference alignment.">
-            <figcaption>Table 1. Main unconditional multi-objective results.</figcaption>
-          </figure>
-          <figure class="figure-panel">
-            <img src="assets/figure-4-pareto-frontier.png" alt="Pareto-front analysis comparing ProteinOPD with ProtGPT2, ASPO, and ProLLaMA.">
-            <figcaption>Figure 4. Pareto-front expansion across objectives.</figcaption>
-          </figure>
-          <figure class="figure-panel">
-            <img src="assets/figure-5-single-objective.png" alt="Single-objective alignment results in unconditional and conditional settings.">
-            <figcaption>Figure 5. Single-objective alignment analysis.</figcaption>
-          </figure>
-          <figure class="figure-panel">
-            <img src="assets/figure-6-efficiency.png" alt="Efficiency analysis comparing ProteinOPD and ProtRL over steps, time, data size, and filtering threshold.">
-            <figcaption>Figure 6. Online and offline efficiency.</figcaption>
-          </figure>
-          <figure class="figure-panel">
-            <img src="assets/figure-7-case-visualization.png" alt="Residue-level visualization comparing ProteinOPD and ASPO structures and solubility surfaces.">
-            <figcaption>Figure 7. Residue-level case visualization.</figcaption>
-          </figure>
+        <div class="table-panel" role="region" aria-label="Main unconditional results table" tabindex="0">
+          <table class="paper-table">
+            <caption>Table 1. Performance comparison in the unconditional setting.</caption>
+            <thead>
+              <tr>
+                <th rowspan="2">Model</th>
+                <th colspan="3">Designability</th>
+                <th colspan="6">Preference Alignment Ability</th>
+                <th>Overall</th>
+              </tr>
+              <tr>
+                <th>PPL ↓</th>
+                <th>Novelty-U ↑</th>
+                <th>Novelty-T ↑</th>
+                <th>pLDDT ↑</th>
+                <th>%&gt;70 ↑</th>
+                <th>pAE ↓</th>
+                <th>%&lt;10 ↑</th>
+                <th>Sol ↑</th>
+                <th>Thermo ↑</th>
+                <th>HV ↑</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th>Random (U)</th><td>1765.28</td><td>57.13</td><td>-</td><td>24.02</td><td>0.00</td><td>24.15</td><td>0.00</td><td>0.34</td><td>0.02</td><td>0.05</td></tr>
+              <tr><th>Random (E)</th><td>1747.35</td><td>59.84</td><td>-</td><td>26.90</td><td>0.39</td><td>23.99</td><td>0.78</td><td>0.44</td><td>0.03</td><td>0.01</td></tr>
+              <tr><th>ESM2</th><td>1467.04</td><td>52.75</td><td>60.72</td><td>47.52</td><td>5.68</td><td>25.70</td><td>0.55</td><td>0.40</td><td>0.42</td><td>0.15</td></tr>
+              <tr><th>ESM3</th><td>353.71</td><td>51.21</td><td>72.66</td><td>61.30</td><td>27.49</td><td>19.68</td><td>20.52</td><td>0.31</td><td>0.56</td><td>0.21</td></tr>
+              <tr><th>ProGen2</th><td>113.04</td><td>85.76</td><td>58.70</td><td>47.44</td><td>10.55</td><td>24.70</td><td>6.25</td><td>0.54</td><td>0.29</td><td>0.44</td></tr>
+              <tr><th>ProLLaMA</th><td>1445.80</td><td>55.07</td><td>42.95</td><td>40.17</td><td>0.00</td><td>19.40</td><td>0.39</td><td>0.63</td><td>0.49</td><td>0.06</td></tr>
+              <tr><th>ProtGPT2</th><td>339.57</td><td>59.97</td><td>69.17</td><td>64.77</td><td>42.58</td><td>17.69</td><td>24.61</td><td>0.59</td><td>0.48</td><td>0.33</td></tr>
+              <tr><th>Pinal</th><td>542.49</td><td>46.44</td><td>45.68</td><td>64.32</td><td>52.79</td><td>15.92</td><td>40.28</td><td>0.41</td><td>0.28</td><td>0.37</td></tr>
+              <tr><th>ProteinDT</th><td>1255.16</td><td>50.69</td><td>52.25</td><td>42.75</td><td>11.37</td><td>24.77</td><td>5.82</td><td>0.39</td><td>0.36</td><td>0.29</td></tr>
+              <tr><th>ProDVa</th><td>79.42</td><td>2.21</td><td>37.58</td><td>58.04</td><td>9.38</td><td>18.88</td><td>7.81</td><td>0.36</td><td>0.05</td><td>0.02</td></tr>
+              <tr><th>ASPO</th><td>804.45</td><td>51.57</td><td>56.77</td><td>47.99</td><td>1.95</td><td>19.63</td><td>3.12</td><td>0.69</td><td>0.68</td><td>0.17</td></tr>
+              <tr><th>MoMPNN</th><td>748.73</td><td>42.50</td><td>65.47</td><td>70.19</td><td>50.66</td><td>16.78</td><td>35.05</td><td>0.57</td><td>0.65</td><td>0.46</td></tr>
+              <tr class="best-row"><th>ProteinOPD</th><td>55.25</td><td>54.96</td><td>75.68</td><td>74.37</td><td>61.72</td><td>13.91</td><td>45.70</td><td>0.69</td><td>0.74</td><td>0.62</td></tr>
+            </tbody>
+          </table>
         </div>
       </section>
 
-      <section class="section resources-section" id="resources">
+      <section class="section analysis-section" id="rq1">
         <div class="section-heading">
-          <p class="eyebrow">Resources</p>
-          <h2>Code, notebooks, and reproducible entry points</h2>
+          <p class="eyebrow">RQ1</p>
+          <h2>Does ProteinOPD expand the Pareto frontier?</h2>
         </div>
-        <div class="resource-grid">
-          <a href="https://github.com/THU-AI4S/ProteinOPD">
-            <span>Repository</span>
-            <strong>THU-AI4S/ProteinOPD</strong>
-          </a>
-          <a href="https://colab.research.google.com/github/THU-AI4S/ProteinOPD/blob/main/notebooks/proteinopd_training_demo.ipynb">
-            <span>Notebook</span>
-            <strong>Training Demo</strong>
-          </a>
-          <a href="https://colab.research.google.com/github/THU-AI4S/ProteinOPD/blob/main/notebooks/proteinopd_inference.ipynb">
-            <span>Notebook</span>
-            <strong>Inference</strong>
-          </a>
-          <a href="https://github.com/THU-AI4S/ProteinOPD#readme">
-            <span>Documentation</span>
-            <strong>README</strong>
-          </a>
-        </div>
+        <figure class="figure-panel study-figure">
+          <img src="assets/figure-4-pareto-frontier.png" alt="Pareto-front analysis comparing ProteinOPD with ProtGPT2, ASPO, and ProLLaMA.">
+          <figcaption>Figure 4. ProteinOPD shifts the Pareto frontier outward across designability and preference objectives.</figcaption>
+        </figure>
       </section>
 
-      <section class="section citation-section" id="citation">
+      <section class="section analysis-section" id="rq2">
         <div class="section-heading">
-          <p class="eyebrow">Citation</p>
-          <h2>Citation coming soon</h2>
+          <p class="eyebrow">RQ2</p>
+          <h2>Can OPD transfer preference signals while mitigating forgetting?</h2>
         </div>
-        <div class="citation-box">
-          <p>
-            The public citation will be added after the non-anonymous version is available. For now,
-            please refer to the arXiv record.
-          </p>
-          <a class="button" href="https://arxiv.org/abs/2605.10189">Open arXiv</a>
+        <figure class="figure-panel study-figure">
+          <img src="assets/figure-5-single-objective.png" alt="Single-objective alignment results in unconditional and conditional settings.">
+          <figcaption>Figure 5. Single-objective alignment in unconditional and conditional settings.</figcaption>
+        </figure>
+      </section>
+
+      <section class="section analysis-section" id="rq3">
+        <div class="section-heading">
+          <p class="eyebrow">RQ3</p>
+          <h2>How efficient is ProteinOPD in computation and data?</h2>
         </div>
+        <figure class="figure-panel study-figure">
+          <img src="assets/figure-6-efficiency.png" alt="Efficiency analysis comparing ProteinOPD and ProtRL over steps, time, data size, and filtering threshold.">
+          <figcaption>Figure 6. Online training efficiency and offline teacher-construction data analysis.</figcaption>
+        </figure>
+      </section>
+
+      <section class="section analysis-section" id="case-study">
+        <div class="section-heading">
+          <p class="eyebrow">Case Analysis</p>
+          <h2>Residue-level visualization of generated proteins</h2>
+        </div>
+        <figure class="figure-panel study-figure compact-figure">
+          <img src="assets/figure-7-case-visualization.png" alt="Residue-level visualization comparing ProteinOPD and ASPO structures and solubility surfaces.">
+          <figcaption>Figure 7. ProteinOPD generates novel sequences with stronger foldability and solubility scores.</figcaption>
+        </figure>
       </section>
     </main>
 
