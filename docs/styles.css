@@ -91,7 +91,7 @@ img {
 .site-nav a {
   border-radius: 7px;
   color: var(--soft-ink);
-  font-size: 0.92rem;
+  font-size: 0.86rem;
   font-weight: 700;
   padding: 8px 10px;
 }
@@ -134,7 +134,7 @@ img {
 .eyebrow {
   margin: 0 0 12px;
   color: var(--teal);
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 900;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -150,7 +150,7 @@ p {
 h1 {
   margin: 0;
   color: #10201e;
-  font-size: clamp(3.2rem, 8.5vw, 6rem);
+  font-size: clamp(2.65rem, 6vw, 4.35rem);
   font-weight: 900;
   letter-spacing: 0;
   line-height: 0.88;
@@ -160,7 +160,7 @@ h1 {
   max-width: 900px;
   margin: 18px auto 0;
   color: var(--ink);
-  font-size: clamp(1.18rem, 2.35vw, 1.85rem);
+  font-size: clamp(1.02rem, 1.8vw, 1.38rem);
   font-weight: 760;
   letter-spacing: 0;
   line-height: 1.08;
@@ -170,7 +170,7 @@ h1 {
   max-width: 780px;
   margin: 20px auto 0;
   color: var(--soft-ink);
-  font-size: 1.08rem;
+  font-size: 0.98rem;
 }
 
 .hero-actions {
@@ -264,7 +264,7 @@ h1 {
 
 .hero-stats dt {
   color: var(--teal);
-  font-size: 1.72rem;
+  font-size: 1.45rem;
   font-weight: 900;
   line-height: 1;
 }
@@ -289,10 +289,29 @@ h1 {
   margin-bottom: 26px;
 }
 
+.abstract-panel {
+  max-width: 920px;
+  border-left: 4px solid var(--teal);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  background: rgba(255, 255, 255, 0.78);
+  padding: 22px 26px;
+}
+
+.abstract-panel p {
+  margin: 0;
+  color: var(--soft-ink);
+  font-size: 0.98rem;
+  line-height: 1.68;
+}
+
+.abstract-panel p + p {
+  margin-top: 14px;
+}
+
 h2 {
   margin: 0;
   color: var(--ink);
-  font-size: clamp(1.65rem, 3.4vw, 2.65rem);
+  font-size: clamp(1.35rem, 2.35vw, 2rem);
   font-weight: 880;
   letter-spacing: 0;
   line-height: 1.02;
@@ -301,7 +320,7 @@ h2 {
 h3 {
   margin: 0 0 8px;
   color: var(--ink);
-  font-size: 1rem;
+  font-size: 0.94rem;
   font-weight: 820;
   letter-spacing: 0;
   line-height: 1.25;
@@ -310,7 +329,7 @@ h3 {
 .method-steps p {
   margin: 0;
   color: var(--muted);
-  font-size: 0.96rem;
+  font-size: 0.9rem;
 }
 
 .method-layout {
@@ -385,7 +404,7 @@ h3 {
 .result-highlights strong {
   display: block;
   color: var(--teal);
-  font-size: 1.45rem;
+  font-size: 1.28rem;
   font-weight: 900;
   line-height: 1;
 }
@@ -394,7 +413,7 @@ h3 {
   display: block;
   margin-top: 8px;
   color: var(--soft-ink);
-  font-size: 0.94rem;
+  font-size: 0.88rem;
   font-weight: 700;
   line-height: 1.36;
 }
@@ -602,21 +621,25 @@ h3 {
   }
 
   h1 {
-    font-size: 2.08rem;
+    font-size: 1.9rem;
     line-height: 0.92;
   }
 
   .subtitle {
-    font-size: 1.14rem;
+    font-size: 1.02rem;
   }
 
   .eyebrow {
-    font-size: 0.66rem;
+    font-size: 0.62rem;
     letter-spacing: 0.08em;
   }
 
   h2 {
-    font-size: 1.72rem;
+    font-size: 1.38rem;
+  }
+
+  .abstract-panel {
+    padding: 18px;
   }
 
   .hero-actions {

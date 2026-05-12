@@ -23,7 +23,8 @@
       </button>
       <nav class="site-nav" aria-label="Primary navigation">
         <a href="#overview">Overview</a>
-        <a href="#outline">Outline</a>
+        <a href="#abstract">Abstract</a>
+        <a href="#method">Method</a>
         <a href="#main-results">Main Results</a>
         <a href="#rq1">RQ1</a>
         <a href="#rq2">RQ2</a>
@@ -71,9 +72,36 @@
         </dl>
       </section>
 
-      <section class="section method-section" id="outline">
+      <section class="section abstract-section" id="abstract">
         <div class="section-heading">
-          <p class="eyebrow">Outline</p>
+          <p class="eyebrow">Abstract</p>
+          <h2>Preference alignment without sacrificing protein designability</h2>
+        </div>
+        <div class="abstract-panel">
+          <p>
+            Designing proteins with desired functions or properties is central to synthetic biology,
+            therapeutic development, and drug discovery. Protein language models can generate
+            designable protein sequences, but preference alignment can cause catastrophic forgetting
+            and can struggle to balance competing objectives.
+          </p>
+          <p>
+            ProteinOPD adapts a pretrained protein language model into preference-specific teachers
+            and distills their signals into a shared student using token-level on-policy distillation
+            on the student's own trajectories. For multi-objective alignment, the student is guided
+            by a normalized geometric consensus of weighted teachers, enabling bounded optimization
+            under objective conflicts.
+          </p>
+          <p>
+            Experiments show that ProteinOPD substantially improves target preference objectives
+            while preserving designability, and achieves an 8x training speedup over RL-based
+            alignment competitors.
+          </p>
+        </div>
+      </section>
+
+      <section class="section method-section" id="method">
+        <div class="section-heading">
+          <p class="eyebrow">Method</p>
           <h2>Teacher construction, OPD, and consensus distillation</h2>
         </div>
         <div class="method-layout">
