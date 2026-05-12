@@ -290,22 +290,89 @@ h1 {
 }
 
 .abstract-panel {
-  max-width: 920px;
-  border-left: 4px solid var(--teal);
-  border-radius: 0 var(--radius) var(--radius) 0;
-  background: rgba(255, 255, 255, 0.78);
-  padding: 22px 26px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 26px;
+  align-items: stretch;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(248, 251, 250, 0.92));
+  box-shadow: 0 10px 30px rgba(23, 37, 34, 0.055);
+  padding: 26px;
 }
 
-.abstract-panel p {
+.abstract-copy {
+  display: grid;
+  gap: 14px;
+}
+
+.abstract-copy p {
   margin: 0;
   color: var(--soft-ink);
-  font-size: 0.98rem;
-  line-height: 1.68;
+  font-family:
+    Georgia, "Times New Roman", ui-serif, serif;
+  font-size: 1rem;
+  line-height: 1.74;
 }
 
-.abstract-panel p + p {
+.abstract-copy p:first-child::first-letter {
+  color: var(--teal);
+  float: left;
+  font-size: 3.15rem;
+  font-weight: 700;
+  line-height: 0.86;
+  margin: 8px 8px 0 0;
+}
+
+.abstract-aside {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-left: 1px solid var(--line);
+  padding-left: 24px;
+}
+
+.abstract-aside span {
+  color: var(--teal);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.abstract-aside strong {
+  display: block;
   margin-top: 14px;
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1.34;
+}
+
+.abstract-aside ul {
+  display: grid;
+  gap: 10px;
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.abstract-aside li {
+  position: relative;
+  color: var(--soft-ink);
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding-left: 18px;
+}
+
+.abstract-aside li::before {
+  position: absolute;
+  top: 0.68em;
+  left: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--teal);
+  content: "";
 }
 
 h2 {
@@ -566,6 +633,17 @@ h3 {
     grid-template-columns: 1fr;
   }
 
+  .abstract-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .abstract-aside {
+    border-top: 1px solid var(--line);
+    border-left: 0;
+    padding-top: 20px;
+    padding-left: 0;
+  }
+
   .resource-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -640,6 +718,15 @@ h3 {
 
   .abstract-panel {
     padding: 18px;
+  }
+
+  .abstract-copy p {
+    font-size: 0.95rem;
+    line-height: 1.65;
+  }
+
+  .abstract-copy p:first-child::first-letter {
+    font-size: 2.55rem;
   }
 
   .hero-actions {

@@ -78,24 +78,38 @@
           <h2>Preference alignment without sacrificing protein designability</h2>
         </div>
         <div class="abstract-panel">
-          <p>
-            Designing proteins with desired functions or properties is central to synthetic biology,
-            therapeutic development, and drug discovery. Protein language models can generate
-            designable protein sequences, but preference alignment can cause catastrophic forgetting
-            and can struggle to balance competing objectives.
-          </p>
-          <p>
-            ProteinOPD adapts a pretrained protein language model into preference-specific teachers
-            and distills their signals into a shared student using token-level on-policy distillation
-            on the student's own trajectories. For multi-objective alignment, the student is guided
-            by a normalized geometric consensus of weighted teachers, enabling bounded optimization
-            under objective conflicts.
-          </p>
-          <p>
-            Experiments show that ProteinOPD substantially improves target preference objectives
-            while preserving designability, and achieves an 8x training speedup over RL-based
-            alignment competitors.
-          </p>
+          <div class="abstract-copy">
+            <p>
+              Designing proteins with desired functions or properties is a central goal in synthetic
+              biology, therapeutic development, and drug discovery. Recent protein language models
+              can generate highly designable sequences, while preference alignment offers a way to
+              steer designs toward desired properties. However, existing alignment methods can cause
+              catastrophic forgetting of pretrained protein knowledge and often struggle to balance
+              multiple competing objectives.
+            </p>
+            <p>
+              ProteinOPD is a multi-objective preference alignment framework that adapts a
+              pretrained protein language model into preference-specific teachers and distills their
+              knowledge into a shared student through token-level on-policy distillation on the
+              student's own trajectories. In the multi-objective setting, the student is aligned to a
+              normalized geometric consensus of weighted teachers, providing a conflict-aware target
+              for balancing preferences.
+            </p>
+            <p>
+              Experiments show that ProteinOPD substantially improves target preference objectives
+              without compromising designability, and achieves an 8x training speedup over RL-based
+              alignment competitors.
+            </p>
+          </div>
+          <aside class="abstract-aside" aria-label="Abstract highlights">
+            <span>Core idea</span>
+            <strong>On-policy distillation for multi-objective protein preference alignment</strong>
+            <ul>
+              <li>Preference-specific teachers</li>
+              <li>Geometric consensus target</li>
+              <li>Designability-preserving alignment</li>
+            </ul>
+          </aside>
         </div>
       </section>
 
