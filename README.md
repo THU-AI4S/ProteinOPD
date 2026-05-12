@@ -1,18 +1,21 @@
 # ProteinOPD
 
+Paper: [ProteinOPD: Geometric Protein Optimization via Optimal Planning in Diffusion Paths](https://arxiv.org/abs/2605.10189)
+
 ProteinOPD currently contains two training and generation tracks:
 
 - `unconditional`: ProtGPT2 prefix-tuning teacher construction, ProtGPT2 geometric ProteinOPD training, and unconditional generation.
 - `conditional`: ProLLaMA LoRA instruction-tuning teacher construction, ProLLaMA geometric ProteinOPD training, and conditional generation.
 
+## Pipeline
+
+![ProteinOPD pipeline](images/pipeline.png)
+
+The original PDF version is available at [images/pipeline.pdf](images/pipeline.pdf).
+
 ## Environment Setup
 
-The repository provides two dependency files:
-
-- `environment.yml`: create a fresh conda environment with PyTorch/CUDA and the project dependencies.
-- `requirements.txt`: install the project Python dependencies into an existing PyTorch/CUDA environment. It does not install `torch`.
-
-Option 1: create a fresh conda environment.
+Create the conda environment from `environment.yml`:
 
 ```bash
 conda env create -f environment.yml
@@ -20,15 +23,6 @@ conda activate proteinopd
 ```
 
 `environment.yml` uses `pytorch-cuda=12.1` by default. If your server driver or cluster image requires another CUDA version, edit the `pytorch-cuda` version in `environment.yml` before creating the environment.
-
-Option 2: install the project dependencies into an existing PyTorch/CUDA conda environment.
-
-```bash
-conda activate <your_env>
-pip install -r requirements.txt
-```
-
-`requirements.txt` does not install PyTorch to avoid replacing a CUDA-matched cluster installation. Install PyTorch using the method recommended for your cluster, or use `environment.yml`.
 
 Check the core dependencies after installation:
 
