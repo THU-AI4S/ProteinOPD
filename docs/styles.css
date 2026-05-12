@@ -27,6 +27,7 @@ html {
 
 body {
   margin: 0;
+  overflow-x: hidden;
   background:
     linear-gradient(90deg, rgba(8, 127, 111, 0.035) 1px, transparent 1px),
     linear-gradient(180deg, #ffffff 0%, var(--bg) 34%, #ffffff 100%);
@@ -572,12 +573,67 @@ h3 {
     padding: 10px 12px;
   }
 
+  .hero,
+  .section {
+    width: 100%;
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .hero-copy,
+  .section-heading {
+    width: calc(100vw - 36px);
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
   .hero {
     padding-top: 62px;
   }
 
+  h1 {
+    font-size: 2.62rem;
+    line-height: 0.92;
+  }
+
+  .subtitle {
+    font-size: 1.32rem;
+  }
+
+  .eyebrow {
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+  }
+
+  h2 {
+    font-size: 2.18rem;
+  }
+
+  .hero-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
   .hero-actions .button {
-    flex: 1 1 145px;
+    min-width: 0;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size: 0.96rem;
+    text-align: center;
+  }
+
+  .hero-figure,
+  .figure-panel {
+    overflow-x: auto;
+  }
+
+  .hero-figure img,
+  .featured-figure img,
+  .figure-grid .wide img,
+  .figure-panel img {
+    width: 720px;
+    max-width: none;
   }
 
   .hero-stats,
