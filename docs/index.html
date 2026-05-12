@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ProteinOPD</title>
+    <meta
+      name="description"
+      content="ProteinOPD is a multi-objective preference alignment framework for protein language models."
+    >
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="ProteinOPD home">
+        <span class="brand-mark" aria-hidden="true">P</span>
+        <span>ProteinOPD</span>
+      </a>
+      <button class="nav-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <nav class="site-nav" aria-label="Primary navigation">
+        <a href="#overview">Overview</a>
+        <a href="#contributions">Contributions</a>
+        <a href="#method">Method</a>
+        <a href="#results">Results</a>
+        <a href="#resources">Resources</a>
+        <a href="#citation">Citation</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero" id="overview">
+        <div class="hero-copy">
+          <p class="eyebrow">Preference alignment for protein design</p>
+          <h1>ProteinOPD: Towards Effective and Efficient Preference Alignment for Protein Design</h1>
+          <p class="hero-text">
+            ProteinOPD aligns protein language models with multiple competing objectives while
+            preserving designability. It constructs preference-specific teachers and distills their
+            consensus into a shared student with token-level on-policy distillation.
+          </p>
+          <div class="hero-actions" aria-label="Project links">
+            <a class="button primary" href="https://github.com/THU-AI4S/ProteinOPD">GitHub</a>
+            <a class="button" href="https://arxiv.org/abs/2605.10189">arXiv</a>
+            <a
+              class="button"
+              href="https://colab.research.google.com/github/THU-AI4S/ProteinOPD/blob/main/notebooks/proteinopd_inference.ipynb"
+            >Inference Colab</a>
+          </div>
+          <dl class="hero-stats" aria-label="Key results">
+            <div>
+              <dt>0.62</dt>
+              <dd>Hypervolume</dd>
+            </div>
+            <div>
+              <dt>34.8%</dt>
+              <dd>HV gain over MoMPNN</dd>
+            </div>
+            <div>
+              <dt>8x</dt>
+              <dd>Training speedup</dd>
+            </div>
+          </dl>
+        </div>
+        <div class="hero-visual" aria-label="ProteinOPD concept">
+          <div class="sequence-card">
+            <div class="sequence-row">
+              <span>M</span><span>P</span><span>T</span><span>R</span><span>M</span><span>K</span>
+            </div>
+            <div class="score-grid">
+              <div><strong>pLDDT</strong><span>74.37</span></div>
+              <div><strong>Sol</strong><span>0.69</span></div>
+              <div><strong>Thermo</strong><span>0.74</span></div>
+              <div><strong>PPL</strong><span>55.25</span></div>
+            </div>
+          </div>
+          <div class="consensus-card">
+            <p>Teacher policies</p>
+            <div class="bars" aria-hidden="true">
+              <span style="height: 56%"></span>
+              <span style="height: 82%"></span>
+              <span style="height: 38%"></span>
+              <span style="height: 68%"></span>
+            </div>
+            <p>Geometric consensus</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="contributions">
+        <div class="section-heading">
+          <p class="eyebrow">Contributions</p>
+          <h2>Built for conflicting protein objectives</h2>
+        </div>
+        <div class="contribution-grid">
+          <article class="contribution-card">
+            <span>01</span>
+            <h3>Multi-objective alignment</h3>
+            <p>
+              Optimizes foldability, solubility, and thermostability while keeping generated
+              sequences plausible and novel.
+            </p>
+          </article>
+          <article class="contribution-card">
+            <span>02</span>
+            <h3>Generalized OPD</h3>
+            <p>
+              Extends on-policy distillation from single-teacher alignment to multi-teacher protein
+              preference alignment.
+            </p>
+          </article>
+          <article class="contribution-card">
+            <span>03</span>
+            <h3>Geometric consensus</h3>
+            <p>
+              Uses a normalized product-of-experts target to retain tokens supported by weighted
+              preference teachers.
+            </p>
+          </article>
+          <article class="contribution-card">
+            <span>04</span>
+            <h3>Efficient training</h3>
+            <p>
+              Delivers dense token-level supervision and reaches comparable thermostability about
+              eight times faster than RL-based alignment.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section method-section" id="method">
+        <div class="section-heading">
+          <p class="eyebrow">Method</p>
+          <h2>Teacher construction, OPD, and consensus distillation</h2>
+        </div>
+        <div class="method-layout">
+          <div class="method-steps">
+            <article>
+              <span>Stage 1</span>
+              <h3>Preference teachers</h3>
+              <p>
+                Sample protein sequences, score them with property-specific oracles, and adapt a
+                pretrained PLM into specialized teachers with small filtered datasets.
+              </p>
+            </article>
+            <article>
+              <span>Stage 2</span>
+              <h3>Single-objective OPD</h3>
+              <p>
+                Train the student on its own trajectories with dense token-level supervision from a
+                preference-specific teacher.
+              </p>
+            </article>
+            <article>
+              <span>Stage 3</span>
+              <h3>Generalized OPD</h3>
+              <p>
+                Combine teachers through a normalized product-of-experts target and align the
+                student to the geometric consensus.
+              </p>
+            </article>
+          </div>
+          <figure class="figure-panel featured-figure">
+            <img src="assets/figure-3-method.png" alt="ProteinOPD method overview with teacher construction, standard OPD, and generalized OPD.">
+            <figcaption>Figure 3. ProteinOPD framework overview.</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="section results-section" id="results">
+        <div class="section-heading">
+          <p class="eyebrow">Results</p>
+          <h2>Better alignment-designability trade-offs</h2>
+        </div>
+        <div class="result-highlights">
+          <article>
+            <strong>0.62 HV</strong>
+            <span>Best overall performance in unconditional multi-objective preference alignment.</span>
+          </article>
+          <article>
+            <strong>74.37 pLDDT</strong>
+            <span>Improves foldability while maintaining novelty and sequence plausibility.</span>
+          </article>
+          <article>
+            <strong>0.74 Thermo</strong>
+            <span>Outperforms the strongest thermostability baseline in the main comparison.</span>
+          </article>
+        </div>
+
+        <div class="figure-grid">
+          <figure class="figure-panel wide">
+            <img src="assets/table-1-unconditional-results.png" alt="Table comparing ProteinOPD with baselines in unconditional multi-objective preference alignment.">
+            <figcaption>Table 1. Main unconditional multi-objective results.</figcaption>
+          </figure>
+          <figure class="figure-panel">
+            <img src="assets/figure-4-pareto-frontier.png" alt="Pareto-front analysis comparing ProteinOPD with ProtGPT2, ASPO, and ProLLaMA.">
+            <figcaption>Figure 4. Pareto-front expansion across objectives.</figcaption>
+          </figure>
+          <figure class="figure-panel">
+            <img src="assets/figure-5-single-objective.png" alt="Single-objective alignment results in unconditional and conditional settings.">
+            <figcaption>Figure 5. Single-objective alignment analysis.</figcaption>
+          </figure>
+          <figure class="figure-panel">
+            <img src="assets/figure-6-efficiency.png" alt="Efficiency analysis comparing ProteinOPD and ProtRL over steps, time, data size, and filtering threshold.">
+            <figcaption>Figure 6. Online and offline efficiency.</figcaption>
+          </figure>
+          <figure class="figure-panel">
+            <img src="assets/figure-7-case-visualization.png" alt="Residue-level visualization comparing ProteinOPD and ASPO structures and solubility surfaces.">
+            <figcaption>Figure 7. Residue-level case visualization.</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="section resources-section" id="resources">
+        <div class="section-heading">
+          <p class="eyebrow">Resources</p>
+          <h2>Code, notebooks, and reproducible entry points</h2>
+        </div>
+        <div class="resource-grid">
+          <a href="https://github.com/THU-AI4S/ProteinOPD">
+            <span>Repository</span>
+            <strong>THU-AI4S/ProteinOPD</strong>
+          </a>
+          <a href="https://colab.research.google.com/github/THU-AI4S/ProteinOPD/blob/main/notebooks/proteinopd_training_demo.ipynb">
+            <span>Notebook</span>
+            <strong>Training Demo</strong>
+          </a>
+          <a href="https://colab.research.google.com/github/THU-AI4S/ProteinOPD/blob/main/notebooks/proteinopd_inference.ipynb">
+            <span>Notebook</span>
+            <strong>Inference</strong>
+          </a>
+          <a href="https://github.com/THU-AI4S/ProteinOPD#readme">
+            <span>Documentation</span>
+            <strong>README</strong>
+          </a>
+        </div>
+      </section>
+
+      <section class="section citation-section" id="citation">
+        <div class="section-heading">
+          <p class="eyebrow">Citation</p>
+          <h2>Citation coming soon</h2>
+        </div>
+        <div class="citation-box">
+          <p>
+            The public citation will be added after the non-anonymous version is available. For now,
+            please refer to the arXiv record.
+          </p>
+          <a class="button" href="https://arxiv.org/abs/2605.10189">Open arXiv</a>
+        </div>
+      </section>
+    </main>
+
+    <button class="back-to-top" type="button" aria-label="Back to top">Top</button>
+    <script src="script.js"></script>
+  </body>
+</html>
