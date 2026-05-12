@@ -307,35 +307,6 @@ h3 {
   line-height: 1.25;
 }
 
-.contribution-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--paper);
-  overflow: hidden;
-}
-
-.contribution-card {
-  min-height: 214px;
-  border-right: 1px solid var(--line);
-  background: linear-gradient(180deg, #ffffff 0%, #fbfefd 100%);
-  padding: 22px;
-}
-
-.contribution-card:last-child {
-  border-right: 0;
-}
-
-.contribution-card span {
-  display: inline-flex;
-  margin-bottom: 44px;
-  color: var(--teal);
-  font-size: 0.82rem;
-  font-weight: 900;
-}
-
-.contribution-card p,
 .method-steps p {
   margin: 0;
   color: var(--muted);
@@ -544,24 +515,6 @@ h3 {
   line-height: 1.25;
 }
 
-.citation-box {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--paper);
-  padding: 22px;
-}
-
-.citation-box p {
-  max-width: 720px;
-  margin: 0;
-  color: var(--soft-ink);
-  font-weight: 700;
-}
-
 .back-to-top {
   position: fixed;
   right: 18px;
@@ -593,18 +546,8 @@ h3 {
     grid-template-columns: 1fr;
   }
 
-  .contribution-grid,
   .resource-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .contribution-card:nth-child(2) {
-    border-right: 0;
-  }
-
-  .contribution-card:nth-child(1),
-  .contribution-card:nth-child(2) {
-    border-bottom: 1px solid var(--line);
   }
 }
 
@@ -710,8 +653,7 @@ h3 {
 
   .hero-stats,
   .result-highlights,
-  .resource-grid,
-  .contribution-grid {
+  .resource-grid {
     grid-template-columns: 1fr;
   }
 
@@ -719,22 +661,8 @@ h3 {
     gap: 0;
   }
 
-  .contribution-card,
-  .contribution-card:nth-child(2) {
-    border-right: 0;
-    border-bottom: 1px solid var(--line);
-  }
-
-  .contribution-card:last-child {
-    border-bottom: 0;
-  }
-
   .figure-grid .figure-panel:not(.wide) {
     grid-column: 1 / -1;
   }
 
-  .citation-box {
-    align-items: flex-start;
-    flex-direction: column;
-  }
 }
