@@ -2,6 +2,8 @@
 
 Paper: [ProteinOPD: Towards Effective and Efficient Preference Alignment for Protein Design](https://arxiv.org/abs/2605.10189)
 
+Project page: [https://thu-ai4s.github.io/ProteinOPD/](https://thu-ai4s.github.io/ProteinOPD/)
+
 ProteinOPD currently contains two training and generation tracks:
 
 - `unconditional`: ProtGPT2 prefix-tuning teacher construction, ProtGPT2 geometric ProteinOPD training, and unconditional generation.
