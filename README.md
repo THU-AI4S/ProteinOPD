@@ -67,7 +67,7 @@ bash conditional/teacher_construct/scripts/run_it_lora_multigpu.sh
 
 The training data should be instruction JSON/JSONL with `instruction`, `input`, and `output` fields. The output is a ProLLaMA LoRA adapter.
 
-## ProtGPT2 Geometric ProteinOPD
+## ProtGPT2 Generalized ProteinOPD
 
 Edit the teacher configuration:
 
@@ -81,7 +81,7 @@ Run:
 bash unconditional/proteinopd/scripts/run_protein_opd_ddp.sh
 ```
 
-## ProLLaMA Geometric ProteinOPD
+## ProLLaMA Generalized ProteinOPD
 
 Edit the configuration file:
 
