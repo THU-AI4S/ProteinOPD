@@ -3,6 +3,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
+export WANDB_PROJECT="proteinopd_unconditional_opd"
 
 cd "${REPO_ROOT}"
 
@@ -10,7 +11,7 @@ accelerate launch \
   --config_file "${REPO_ROOT}/unconditional/proteinopd/accelerate_ddp.yaml" \
   --num_processes 2 \
   "${REPO_ROOT}/unconditional/proteinopd/protein_opd_train.py" \
-  --num_train_samples 8192 \
+  --num_train_samples 16384 \
   --student_model_name_or_path /path/to/protgpt2-student \
   --teacher_config_path "${REPO_ROOT}/unconditional/proteinopd/configs/teachers.yaml" \
   --prompt_mode unconditional \
@@ -35,6 +36,11 @@ accelerate launch \
   --num_train_epochs 1.0 \
   --logging_steps 1 \
   --save_steps 100 \
+  --sample \
+  --sample_steps 100 \
+  --sample_num_sequences 10 \
+  --sample_temperature 0.7 \
+  --sample_batch_size 1 \
   --report_to wandb \
   --run_name protein_opd_jsd_lr2e-5 \
   --output_dir "${REPO_ROOT}/outputs/protein_opd_jsd_lr2e-5" \

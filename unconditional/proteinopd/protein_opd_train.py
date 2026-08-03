@@ -6,18 +6,19 @@ import os
 import re
 import shutil
 import sys
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
 
 import torch
 import yaml
 from peft import LoraConfig, PeftModel, TaskType, get_peft_model
-from transformers import AutoModelForCausalLM, AutoTokenizer, HfArgumentParser, TrainingArguments, set_seed
+from transformers import AutoModelForCausalLM, AutoTokenizer, HfArgumentParser, TrainerCallback, TrainingArguments, set_seed
 
 from protein_opd_trainer import (
     STUDENT_PREFIX_INIT_FORMAT,
     STUDENT_PREFIX_INIT_METADATA_FILENAME,
+    PeriodicSampleCallback,
     ProteinOPDTrainer,
     TeacherAdapterSpec,
 )
@@ -25,6 +26,34 @@ from protein_data_collator import ProteinOPDDataCollator
 
 
 logger = logging.getLogger(__name__)
+
+
+class WandbRunUrlCallback(TrainerCallback):
+    def on_train_begin(self, args, state, control, **kwargs):
+        reporters = args.report_to if isinstance(args.report_to, (list, tuple)) else [args.report_to]
+        if state.is_world_process_zero and "wandb" in reporters:
+            import wandb
+
+            run_url = getattr(wandb.run, "url", None)
+            print(f"Weights & Biases run: {run_url or 'URL unavailable (check WANDB_MODE/login)'}", flush=True)
+
+
+def _save_training_config_snapshot(
+    output_dir: str,
+    script_args: "ProteinOPDScriptArguments",
+    training_args: "ProteinOPDTrainingArguments",
+    teacher_config: "TeacherConfig",
+) -> None:
+    target_dir = Path(output_dir)
+    target_dir.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "script_args": asdict(script_args),
+        "training_args": training_args.to_dict(),
+        "teacher_config": asdict(teacher_config),
+    }
+    with open(target_dir / "training_config.json", "w", encoding="utf-8") as f:
+        json.dump(payload, f, indent=2, ensure_ascii=False, default=str)
+    shutil.copy2(script_args.teacher_config_path, target_dir / "teachers.yaml")
 
 
 class _StrictBoolSafeLoader(yaml.SafeLoader):
@@ -92,6 +121,11 @@ class ProteinOPDScriptArguments:
 
     save_generations: bool = field(default=True)
     generation_save_steps: int = field(default=5)
+    sample: bool = field(default=False)
+    sample_steps: int = field(default=100)
+    sample_num_sequences: int = field(default=10)
+    sample_temperature: float = field(default=1.0)
+    sample_batch_size: int = field(default=1)
 
     student_tune_mode: str = field(default="lora")
     lora_r: int = field(default=16)
@@ -108,7 +142,7 @@ class ProteinOPDTrainingArguments(TrainingArguments):
     learning_rate: float = field(default=2e-5)
     num_train_epochs: float = field(default=1.0)
     remove_unused_columns: bool = field(default=False)
-    report_to: str = field(default="none")
+    report_to: str = field(default="wandb")
 
 
 def _ensure_local_path(path_value: str, arg_name: str) -> None:
@@ -154,6 +188,10 @@ def _normalize_cli_args(argv: list[str]) -> list[str]:
         "--wi-distance-tau": "--wi_distance_tau",
         "--debug-teacher-diff": "--debug_teacher_diff",
         "--debug-teacher-diff-steps": "--debug_teacher_diff_steps",
+        "--sample-steps": "--sample_steps",
+        "--sample-num-sequences": "--sample_num_sequences",
+        "--sample-temperature": "--sample_temperature",
+        "--sample-batch-size": "--sample_batch_size",
     }
     normalized_args: list[str] = []
     for arg in argv:
@@ -297,6 +335,15 @@ def _validate_script_args(
         raise ValueError("`top_k_loss` must be >= 0")
     if script_args.generation_save_steps <= 0:
         raise ValueError("`generation_save_steps` must be > 0")
+    if script_args.sample:
+        if script_args.sample_steps <= 0:
+            raise ValueError("`sample_steps` must be > 0 when `sample` is enabled")
+        if script_args.sample_num_sequences <= 0:
+            raise ValueError("`sample_num_sequences` must be > 0 when `sample` is enabled")
+        if script_args.sample_temperature <= 0:
+            raise ValueError("`sample_temperature` must be > 0 when `sample` is enabled")
+        if script_args.sample_batch_size <= 0:
+            raise ValueError("`sample_batch_size` must be > 0 when `sample` is enabled")
     if script_args.entropy_alpha < 0:
         raise ValueError("`entropy_alpha` must be >= 0")
     if script_args.wi_entropy_tau <= 0 or script_args.wi_distance_tau <= 0:
@@ -504,9 +551,19 @@ def main() -> None:
         debug_teacher_diff_steps=script_args.debug_teacher_diff_steps,
         save_generations=script_args.save_generations,
         generation_save_steps=script_args.generation_save_steps,
+        sample=script_args.sample,
+        sample_steps=script_args.sample_steps,
+        sample_num_sequences=script_args.sample_num_sequences,
+        sample_temperature=script_args.sample_temperature,
+        sample_batch_size=script_args.sample_batch_size,
+        sample_prompt_ids=data_collator.default_prompt_ids,
         student_prefix_init_enabled=student_prefix_init_enabled,
         log_teacher_entropy=teacher_config.log_teacher_entropy,
     )
+    trainer.add_callback(WandbRunUrlCallback())
+    trainer.add_callback(PeriodicSampleCallback(trainer))
+    if training_args.process_index == 0:
+        _save_training_config_snapshot(training_args.output_dir, script_args, training_args, teacher_config)
     trainer.train()
     if script_args.save_generations:
         trainer._save_generation_outputs(int(trainer.state.global_step))

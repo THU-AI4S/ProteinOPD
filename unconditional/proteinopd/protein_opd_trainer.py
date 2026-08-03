@@ -10,7 +10,8 @@ from typing import Any
 
 import torch
 import torch.nn.functional as F
-from transformers import PreTrainedModel, Trainer
+from accelerate.utils import gather_object
+from transformers import PreTrainedModel, Trainer, TrainerCallback
 
 
 logger = logging.getLogger(__name__)
@@ -27,6 +28,17 @@ class TeacherAdapterSpec:
     adapter_name: str
     weight: float
     temperature: float
+
+
+class PeriodicSampleCallback(TrainerCallback):
+    def __init__(self, trainer: "ProteinOPDTrainer") -> None:
+        self.trainer = trainer
+
+    def on_step_end(self, args, state, control, **kwargs):
+        step = int(state.global_step)
+        if self.trainer.should_run_periodic_sample(step):
+            self.trainer.run_periodic_sample(step)
+        return control
 
 
 class ProteinOPDTrainer(Trainer):
@@ -60,6 +72,12 @@ class ProteinOPDTrainer(Trainer):
         debug_teacher_diff_steps: int = 5,
         save_generations: bool = True,
         generation_save_steps: int = 5,
+        sample: bool = False,
+        sample_steps: int = 100,
+        sample_num_sequences: int = 10,
+        sample_temperature: float = 1.0,
+        sample_batch_size: int = 1,
+        sample_prompt_ids: list[int] | None = None,
         student_prefix_init_enabled: bool = False,
         log_teacher_entropy: bool = False,
         **kwargs,
@@ -112,6 +130,23 @@ class ProteinOPDTrainer(Trainer):
 
         self.save_generations = bool(save_generations)
         self.generation_save_steps = int(generation_save_steps)
+        self.sample = bool(sample)
+        self.sample_steps = int(sample_steps)
+        self.sample_num_sequences = int(sample_num_sequences)
+        self.sample_temperature = float(sample_temperature)
+        self.sample_batch_size = int(sample_batch_size)
+        self.sample_prompt_ids = list(sample_prompt_ids or [])
+        if self.sample:
+            if self.sample_steps <= 0:
+                raise ValueError("`sample_steps` must be > 0 when sampling is enabled.")
+            if self.sample_num_sequences <= 0:
+                raise ValueError("`sample_num_sequences` must be > 0 when sampling is enabled.")
+            if self.sample_temperature <= 0:
+                raise ValueError("`sample_temperature` must be > 0 when sampling is enabled.")
+            if self.sample_batch_size <= 0:
+                raise ValueError("`sample_batch_size` must be > 0 when sampling is enabled.")
+            if not self.sample_prompt_ids:
+                raise ValueError("`sample_prompt_ids` must not be empty when sampling is enabled.")
         self.student_prefix_init_enabled = bool(student_prefix_init_enabled)
         self._generation_outputs_buffer: list[dict[str, Any]] = []
         self._train_metric_buffer: dict[str, list[float]] = {}
@@ -129,6 +164,87 @@ class ProteinOPDTrainer(Trainer):
 
         if self.useloss == "jsd" and self.useZ_t:
             logger.warning("`useZ_t` is ignored when `useloss=jsd`.")
+
+    def should_run_periodic_sample(self, step: int) -> bool:
+        return self.sample and step > 0 and step % self.sample_steps == 0
+
+    def _wandb_enabled(self) -> bool:
+        reporters = self.args.report_to if isinstance(self.args.report_to, (list, tuple)) else [self.args.report_to]
+        return "wandb" in reporters
+
+    def _sample_local_records(self, count: int) -> list[dict[str, str]]:
+        if count <= 0:
+            return []
+        generation_model = self.accelerator.unwrap_model(self.model)
+        was_training = generation_model.training
+        original_use_cache = getattr(generation_model.config, "use_cache", True)
+        generation_model.eval()
+        generation_model.config.use_cache = True
+        records: list[dict[str, str]] = []
+        try:
+            with torch.no_grad():
+                for start in range(0, count, self.sample_batch_size):
+                    batch_size = min(self.sample_batch_size, count - start)
+                    prompt_ids = torch.tensor(
+                        [self.sample_prompt_ids] * batch_size,
+                        dtype=torch.long,
+                        device=self.accelerator.device,
+                    )
+                    attention_mask = torch.ones_like(prompt_ids)
+                    generated = generation_model.generate(
+                        input_ids=prompt_ids,
+                        attention_mask=attention_mask,
+                        **self._build_generation_kwargs(self.sample_temperature),
+                    )
+                    prompt_length = prompt_ids.shape[1]
+                    for row in generated:
+                        sequence = self._tokenizer.decode(
+                            row[prompt_length:].detach().cpu().tolist(),
+                            skip_special_tokens=True,
+                            clean_up_tokenization_spaces=False,
+                        )
+                        records.append({"sequence": "".join(sequence.split())})
+        finally:
+            generation_model.config.use_cache = original_use_cache
+            if was_training:
+                generation_model.train()
+        return records
+
+    def run_periodic_sample(self, step: int) -> None:
+        self.accelerator.wait_for_everyone()
+        world_size = int(self.accelerator.num_processes)
+        rank = int(self.accelerator.process_index)
+        base_count, remainder = divmod(self.sample_num_sequences, world_size)
+        local_count = base_count + (1 if rank < remainder else 0)
+        gathered = gather_object(self._sample_local_records(local_count))
+        if self.accelerator.is_main_process:
+            records = list(gathered)[: self.sample_num_sequences]
+            output_records = [
+                {
+                    "instruction": "N/A",
+                    "reference": "N/A",
+                    "response#1": item["sequence"],
+                }
+                for item in records
+            ]
+            samples_dir = Path(self.args.output_dir) / "samples"
+            samples_dir.mkdir(parents=True, exist_ok=True)
+            output_file = samples_dir / f"samples_step_{step}.json"
+            with open(output_file, "w", encoding="utf-8") as f:
+                json.dump(output_records, f, indent=2, ensure_ascii=False)
+            print(f"Saved {len(records)} periodic samples to: {output_file}", flush=True)
+            if self._wandb_enabled():
+                try:
+                    import wandb
+
+                    if wandb.run is not None:
+                        table = wandb.Table(columns=["step", "sequence"])
+                        for item in records:
+                            table.add_data(step, item["sequence"])
+                        wandb.log({f"samples/step_{step}": table}, step=step, commit=False)
+                except Exception as error:  # Keep monitoring failures from stopping training.
+                    logger.warning("Failed to upload periodic samples to W&B: %s", error)
+        self.accelerator.wait_for_everyone()
 
     def _save(self, output_dir: str | None = None, state_dict=None) -> None:
         if not self.student_prefix_init_enabled:

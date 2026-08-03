@@ -73,6 +73,8 @@ torchrun --nproc_per_node "${NPROC_PER_NODE}" --master_port "${MASTER_PORT}" ins
   --output_dir "${OUTPUT_DIR}" \
   --ddp_timeout 30000 \
   --logging_first_step True \
+  --report_to wandb \
+  --run_name "prollama_teacher_lr2e-5_rank8" \
   --lora_rank "${LORA_RANK}" \
   --lora_alpha "${LORA_ALPHA}" \
   --trainable "${LORA_TRAINABLE}" \

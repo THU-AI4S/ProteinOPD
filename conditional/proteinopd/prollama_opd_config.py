@@ -91,6 +91,11 @@ class GenerationConfig:
     top_k: int = 0
     save_generations: bool = True
     generation_save_steps: int = 5
+    sample: bool = False
+    sample_steps: int = 100
+    sample_num_sequences: int = 10
+    sample_temperature: float = 1.0
+    sample_batch_size: int = 1
 
 
 @dataclass(frozen=True)
@@ -328,6 +333,11 @@ def load_opd_config(config_path: str) -> ProLLaMAOpdConfig:
         top_k=_normalize_int(generation_payload.get("top_k", 0), "generation.top_k"),
         save_generations=_normalize_bool(generation_payload.get("save_generations", True), "generation.save_generations"),
         generation_save_steps=_normalize_int(generation_payload.get("generation_save_steps", 5), "generation.generation_save_steps"),
+        sample=_normalize_bool(generation_payload.get("sample", False), "generation.sample"),
+        sample_steps=_normalize_int(generation_payload.get("sample_steps", 100), "generation.sample_steps"),
+        sample_num_sequences=_normalize_int(generation_payload.get("sample_num_sequences", 10), "generation.sample_num_sequences"),
+        sample_temperature=_normalize_float(generation_payload.get("sample_temperature", 1.0), "generation.sample_temperature"),
+        sample_batch_size=_normalize_int(generation_payload.get("sample_batch_size", 1), "generation.sample_batch_size"),
     )
     if generation.num_train_samples <= 0:
         raise ValueError("`generation.num_train_samples` must be > 0.")
@@ -345,6 +355,15 @@ def load_opd_config(config_path: str) -> ProLLaMAOpdConfig:
         raise ValueError("`generation.top_k` must be >= 0.")
     if generation.generation_save_steps <= 0:
         raise ValueError("`generation.generation_save_steps` must be > 0.")
+    if generation.sample:
+        if generation.sample_steps <= 0:
+            raise ValueError("`generation.sample_steps` must be > 0 when sampling is enabled.")
+        if generation.sample_num_sequences <= 0:
+            raise ValueError("`generation.sample_num_sequences` must be > 0 when sampling is enabled.")
+        if generation.sample_temperature <= 0:
+            raise ValueError("`generation.sample_temperature` must be > 0 when sampling is enabled.")
+        if generation.sample_batch_size <= 0:
+            raise ValueError("`generation.sample_batch_size` must be > 0 when sampling is enabled.")
 
     return ProLLaMAOpdConfig(
         student=student,

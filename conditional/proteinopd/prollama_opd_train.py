@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import json
 import logging
 import os
+import shutil
 import sys
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -14,16 +16,46 @@ from transformers import (
     AutoTokenizer,
     BitsAndBytesConfig,
     HfArgumentParser,
+    TrainerCallback,
     TrainingArguments,
     set_seed,
 )
 
 from prollama_opd_config import ProLLaMAOpdConfig, load_opd_config
 from prollama_opd_data import ProLLaMAOpdDataCollator
-from prollama_opd_trainer import ProLLaMAProteinOPDTrainer, TeacherAdapterSpec
+from prollama_opd_trainer import PeriodicSampleCallback, ProLLaMAProteinOPDTrainer, TeacherAdapterSpec
 
 
 logger = logging.getLogger(__name__)
+
+
+class WandbRunUrlCallback(TrainerCallback):
+    def on_train_begin(self, args, state, control, **kwargs):
+        reporters = args.report_to if isinstance(args.report_to, (list, tuple)) else [args.report_to]
+        if state.is_world_process_zero and "wandb" in reporters:
+            import wandb
+
+            run_url = getattr(wandb.run, "url", None)
+            print(f"Weights & Biases run: {run_url or 'URL unavailable (check WANDB_MODE/login)'}", flush=True)
+
+
+def _save_training_config_snapshot(
+    output_dir: str,
+    config_path: str,
+    script_args: "OpdScriptArguments",
+    training_args: "OpdTrainingArguments",
+    config: ProLLaMAOpdConfig,
+) -> None:
+    target_dir = Path(output_dir)
+    target_dir.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "script_args": asdict(script_args),
+        "training_args": training_args.to_dict(),
+        "opd_config": asdict(config),
+    }
+    with open(target_dir / "training_config.json", "w", encoding="utf-8") as f:
+        json.dump(payload, f, indent=2, ensure_ascii=False, default=str)
+    shutil.copy2(config_path, target_dir / "opd_config.yaml")
 
 
 def _load_causal_lm_with_attention_backend(
@@ -85,7 +117,7 @@ class OpdTrainingArguments(TrainingArguments):
     quant_type: str = field(default="nf4")
     use_flash_attention_2: bool = field(default=False)
     remove_unused_columns: bool = field(default=False)
-    report_to: str = field(default="none")
+    report_to: str = field(default="wandb")
 
 
 class FixedPromptDataset(torch.utils.data.Dataset):
@@ -297,6 +329,12 @@ def main() -> None:
         top_k=config.generation.top_k,
         save_generations=config.generation.save_generations,
         generation_save_steps=config.generation.generation_save_steps,
+        sample=config.generation.sample,
+        sample_steps=config.generation.sample_steps,
+        sample_num_sequences=config.generation.sample_num_sequences,
+        sample_temperature=config.generation.sample_temperature,
+        sample_batch_size=config.generation.sample_batch_size,
+        sample_prompt_ids=data_collator.prompt_ids,
         beta=config.distill.beta,
         top_k_loss=config.distill.top_k_loss,
         useloss=config.distill.loss_type,
@@ -312,6 +350,16 @@ def main() -> None:
         debug_teacher_diff_steps=config.distill.protein_opd.debug_teacher_diff_steps,
         log_teacher_entropy=config.distill.log_teacher_entropy,
     )
+    trainer.add_callback(WandbRunUrlCallback())
+    trainer.add_callback(PeriodicSampleCallback(trainer))
+    if training_args.process_index == 0:
+        _save_training_config_snapshot(
+            training_args.output_dir,
+            script_args.opd_config_path,
+            script_args,
+            training_args,
+            config,
+        )
     trainer.train(resume_from_checkpoint=training_args.resume_from_checkpoint)
     if config.generation.save_generations:
         trainer._save_generation_outputs(int(trainer.state.global_step))

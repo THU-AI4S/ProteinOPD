@@ -24,8 +24,10 @@ https://huggingface.co/models?filter=text-generation
 import logging
 import math
 import os
+import json
+import shutil
 import sys
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from typing import List, Optional
 from pathlib import Path
 import datasets
@@ -41,6 +43,7 @@ from transformers import (
     AutoTokenizer,
     HfArgumentParser,
     Trainer,
+    TrainerCallback,
     TrainingArguments,
     set_seed,
 )
@@ -210,6 +213,7 @@ class DataTrainingArguments:
 
 @dataclass
 class MyTrainingArguments(TrainingArguments):
+    report_to: str = field(default="wandb")
     trainable : Optional[str] = field(default="q_proj,v_proj")
     lora_rank : Optional[int] = field(default=8)
     lora_dropout : Optional[float] = field(default=0.1)
@@ -223,6 +227,30 @@ class MyTrainingArguments(TrainingArguments):
 
 
 logger = logging.getLogger(__name__)
+
+
+class WandbRunUrlCallback(TrainerCallback):
+    def on_train_begin(self, args, state, control, **kwargs):
+        reporters = args.report_to if isinstance(args.report_to, (list, tuple)) else [args.report_to]
+        if state.is_world_process_zero and "wandb" in reporters:
+            import wandb
+
+            run_url = getattr(wandb.run, "url", None)
+            print(f"Weights & Biases run: {run_url or 'URL unavailable (check WANDB_MODE/login)'}", flush=True)
+
+
+def _save_training_config_snapshot(output_dir, model_args, data_args, training_args):
+    target_dir = Path(output_dir)
+    target_dir.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "model_args": asdict(model_args),
+        "data_args": asdict(data_args),
+        "training_args": training_args.to_dict(),
+    }
+    with open(target_dir / "training_config.json", "w", encoding="utf-8") as f:
+        json.dump(payload, f, indent=2, ensure_ascii=False, default=str)
+    if len(sys.argv) == 2 and sys.argv[1].endswith(".json"):
+        shutil.copy2(sys.argv[1], target_dir / "source_training_config.json")
 
 
 def _load_llama_with_attention_backend(model_name_or_path, use_flash_attention_2=False, **model_kwargs):
@@ -600,6 +628,9 @@ def main():
         tokenizer=tokenizer,
         data_collator=data_collator,
     )
+    trainer.add_callback(WandbRunUrlCallback())
+    if training_args.process_index == 0:
+        _save_training_config_snapshot(training_args.output_dir, model_args, data_args, training_args)
     # trainer.add_callback(SavePeftModelCallback)
 
     # Training
@@ -628,6 +659,10 @@ def main():
                 os.makedirs(merged_model_path,exist_ok=True)
                 merged_model.save_pretrained(merged_model_path)
                 tokenizer.save_pretrained(merged_model_path)
+                shutil.copy2(
+                    Path(training_args.output_dir) / "training_config.json",
+                    Path(merged_model_path) / "training_config.json",
+                )
                 logging.info(f"Saved the merged model to {merged_model_path}")
 
     if training_args.do_eval:

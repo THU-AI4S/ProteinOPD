@@ -51,6 +51,11 @@ except ImportError:  # pragma: no cover
     tqdm = None
 
 try:
+    import wandb
+except ImportError:  # pragma: no cover
+    wandb = None
+
+try:
     from transformers import (
         AutoModelForCausalLM,
         AutoTokenizer,
@@ -90,6 +95,9 @@ class TrainConfig:
     early_stop: bool = True
     early_stop_patience: int = 5
     early_stop_min_delta: float = 1e-4
+    wandb_project: str = "proteinopd-unconditional-teacher"
+    wandb_run_name: str = ""
+    wandb_entity: str = ""
 
 
 def parse_args() -> argparse.Namespace:
@@ -176,6 +184,8 @@ def require_runtime_dependencies() -> None:
         missing.append("peft")
     if tqdm is None:
         missing.append("tqdm")
+    if wandb is None:
+        missing.append("wandb")
     if AutoModelForCausalLM is None or AutoTokenizer is None or default_data_collator is None or get_polynomial_decay_schedule_with_warmup is None:
         missing.append("transformers")
     if missing:
@@ -207,7 +217,7 @@ def _get_split_max_token_length(split_dataset, split_name: str, tokenizer, text_
     return max_token_len
 
 
-def train(config: TrainConfig) -> None:
+def train(config: TrainConfig, config_path: str) -> None:
     require_runtime_dependencies()
     device = _resolve_device(config.device)
     writer = SummaryWriter(config.run_dir)
@@ -290,6 +300,18 @@ def train(config: TrainConfig) -> None:
         / f"prefix_{peft_config.peft_type}_{peft_config.task_type}_E{config.num_epochs}"
         f"_LR{config.learning_rate}_BS{config.batch_size}_ML{config.max_length}_VT{config.num_virtual_tokens}"
     )
+    run_name = config.wandb_run_name or final_model_dir.name
+    wandb_run = wandb.init(
+        project=config.wandb_project,
+        entity=config.wandb_entity or None,
+        name=run_name,
+        config=dict(config.__dict__),
+    )
+    wandb.define_metric("global_step")
+    wandb.define_metric("train/*", step_metric="global_step")
+    wandb.define_metric("eval/*", step_metric="global_step")
+    run_url = getattr(wandb_run, "url", None)
+    print(f"Weights & Biases run: {run_url or 'URL unavailable (check WANDB_MODE/login)'}", flush=True)
     best_model_tmp_dir = Path(str(final_model_dir) + "_best_tmp")
     if config.early_stop and best_model_tmp_dir.exists():
         shutil.rmtree(best_model_tmp_dir)
@@ -313,6 +335,13 @@ def train(config: TrainConfig) -> None:
             lr_scheduler.step()
             optimizer.zero_grad()
             writer.add_scalar("train_step/loss", loss.item(), global_step)
+            wandb.log(
+                {
+                    "train/step_loss": loss.item(),
+                    "train/learning_rate": lr_scheduler.get_last_lr()[0],
+                    "global_step": global_step,
+                },
+            )
 
         model.eval()
         eval_loss = 0.0
@@ -338,6 +367,16 @@ def train(config: TrainConfig) -> None:
             train_ppl,
             eval_ppl,
         )
+        wandb.log(
+            {
+                "train/epoch_loss": train_epoch_loss,
+                "train/epoch_ppl": train_ppl,
+                "eval/loss": eval_epoch_loss,
+                "eval/ppl": eval_ppl,
+                "epoch": epoch + 1,
+                "global_step": (epoch + 1) * len(train_dataloader),
+            },
+        )
 
         if config.early_stop:
             if eval_epoch_loss < best_eval_loss - config.early_stop_min_delta:
@@ -362,7 +401,10 @@ def train(config: TrainConfig) -> None:
         model.save_pretrained(final_model_dir)
         tokenizer.save_pretrained(final_model_dir)
         logger.info("Final model saved to %s", final_model_dir)
+    shutil.copy2(config_path, final_model_dir / "training_config.yaml")
+    logger.info("Training config saved to %s", final_model_dir / "training_config.yaml")
     writer.close()
+    wandb.finish()
 
 
 def main() -> None:
@@ -373,7 +415,7 @@ def main() -> None:
     for key, value in config.__dict__.items():
         logger.info("%s = %s", key, value)
     set_seed(config.seed)
-    train(config)
+    train(config, args.config)
 
 
 if __name__ == "__main__":

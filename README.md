@@ -34,6 +34,13 @@ Check the core dependencies after installation:
 python -c "import torch, transformers, datasets, peft, accelerate, yaml; print('torch', torch.__version__)"
 ```
 
+## Unconditional Model Weights
+
+The released unconditional teacher weights and ProteinOPD-trained model weights are hosted in the [purilion/ProteinOPD](https://huggingface.co/purilion/ProteinOPD/tree/main) Hugging Face repository:
+
+- [Unconditional teacher weights](https://huggingface.co/purilion/ProteinOPD/tree/main)
+- [Unconditional ProteinOPD model weights](https://huggingface.co/purilion/ProteinOPD/tree/main/protgpt2-adapter)
+
 ## ProtGPT2 Prefix Teacher Construction
 
 Edit the configuration file:
@@ -94,6 +101,10 @@ Run:
 ```bash
 bash conditional/proteinopd/scripts/run_prollama_protein_opd_ddp.sh
 ```
+
+### Periodic OPD sampling
+
+Both OPD trainers can independently sample the current student after an optimizer step. Unconditional training uses the CLI options `--sample`, `--sample_steps`, `--sample_num_sequences`, `--sample_temperature`, and `--sample_batch_size`. Conditional training uses the matching keys under `generation` in its YAML config. Samples are written to `<output_dir>/samples/samples_step_<step>.json` and are also logged as W&B tables when W&B reporting is enabled. This is separate from `save_generations`, which records the on-policy rollouts used by the training loss.
 
 ## Generation
 
