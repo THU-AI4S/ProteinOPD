@@ -39,7 +39,7 @@ python -c "import torch, transformers, datasets, peft, accelerate, yaml; print('
 The released unconditional teacher weights and ProteinOPD-trained model weights are hosted in the [purilion/ProteinOPD](https://huggingface.co/purilion/ProteinOPD/tree/main) Hugging Face repository:
 
 - [Unconditional teacher weights](https://huggingface.co/purilion/ProteinOPD/tree/main)
-- [Unconditional ProteinOPD model weights](https://huggingface.co/purilion/ProteinOPD/tree/main/protgpt2-adapter)
+- [Unconditional ProteinOPD model weights](https://huggingface.co/purilion/ProteinOPD/tree/main/opd)
 
 ## ProtGPT2 Prefix Teacher Construction
 
